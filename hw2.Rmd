@@ -1,8 +1,14 @@
+---
+title: "Homework #2"
+author: Nicholas Matthews; nickmatthews713
+date: "2/3/2020"
+output: html_document
+---
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-cool  
 
 This homework is about syntax and basic plotting functions in R, and is **due by the end of Feb 7**. 
 
@@ -28,8 +34,31 @@ a0
 
 ## R commands
 1. Today's temperature has a high of 24 and a low of 15 degree fahrenheit.  Find the corresponding degress in celsius and storage it in a (single) vector named `cel`. Print the variable.
+
+```{r}
+
+fer <- c(24,15)
+cel <- (fer-32)*(5/9)
+cel
+
+```
+
 2. Create a vector of length 200. The odd entries should be 3 and even entries should be 1. Storage the created in a variable named `vec200` and print.
+
+```{r}
+
+vec200 <- rep(c(1,3), length.out=200)
+vec200
+
+```
 3. How many perfect squares are there between 1 and 2001? Storage the answer in a  variable named `numPerfect` and print. You may want to look at `?round`.
+
+```{r}
+
+numPerfect <- floor(sqrt(2001)) - ceiling(sqrt(1)) + 1
+numPerfect
+
+```
 
 ## Cars and mileage
 For this part we will use the `mpg` data set, you can access the data by first installing (using `install.packages('ggplot2')`) and then loading the package `ggplot2` (using `library(ggplot2)`) into your R session. The `mpg` data includes information about fuel economy of popular car models
@@ -38,8 +67,60 @@ for the years 1999 and 2008 as collected by the US Environmental Protection Agen
 Most exercises are from the ggplot2 book section 2.2.1. You might find it helpful for working on the homework to read through this section. *However, all questions can be solved by using just the basic R graphics functions.*
 
 1. What are the 3 most fuel-efficient models in terms of highway mileage? Storage the data frame (with 3 rows) containing all information of these three cars in a variable named `top3` and print.
+
+```{r}
+library(ggplot2)
+
+car_efficient <- mpg[order(mpg$hwy, decreasing = TRUE),]
+top3 <- car_efficient[1:3,]
+top3
+
+```
+##### description
+I used 'library(ggplot)' to include the data frame mpg in my Rmarkdown file. Then, I ordered the dataset by it highway miles per gallon. To do this, I indexed the rows of the data set with a vector returned by the function 'order()' and kept all columns included. This is stored inside of the car_efficient variable. I used indexing once again to store the top 3 rows from car_efficient into variable top3  
+
 2. How many different compact models are included in this dataset? Storage the answer in  a variable named `numCompact` and print.
+
+```{r}
+
+compact <- mpg[mpg$class=='compact',]
+numCompact <- table(compact$model)
+numCompact
+
+```
+##### description
+First, I filtered out the compact cars in the dataset by making a new dataset that only includes compact cars using indexing. Then, I used the 'table()' function to count the number of times each model appears within my new dataset.
+
 3. Create a scatterplot of `hwy` and `cty` and describe the relationship. Why are there so few points visible? Explain your findings.
+
+```{r}
+
+ggplot(data = mpg) + geom_point(mapping=aes(x=hwy, y=cty))
+
+```
+
+##### description  
+
+The scatterplot displays a positive correlation between highway miles per gallon and cities miles per gallon for each car. In other words, If the car has good highway miles per gallon, then the car will most likely have good cities miles per gallon. There are so little points because there is a lot of overlapping of points. For example, rows 6 and 8 of the original dataset both have a value of 16 for cities miles per gallon and a value of 26 for highway miles per gallon.
+
 4. Are cars in 2008 more fuel efficient than cars in 1999? Use graphs *and* summary statistics to answer this question. Explain your findings.
 
-Note: your submission is supposed to be fully reproducible, i.e. the TA and I will 'knit' your submission. Make sure that you don't use any file structure that depends on your computing environment.
+```{r}
+
+mpg2008 <- mpg[mpg$year==2008, c('hwy','cty')]
+mpg1999 <- mpg[mpg$year==1999, c('hwy','cty')]
+mpg2008$mpg.avg <- (mpg2008$hwy + mpg2008$cty)/2
+mpg1999$mpg.avg <- (mpg1999$hwy + mpg1999$cty)/2
+
+summary(mpg2008)
+summary(mpg1999)
+
+mpg$mpg.avg = (mpg$hwy + mpg$cty)/2
+
+ggplot(data=mpg, aes(x=year, y=mpg.avg, group=year)) + geom_boxplot(fill="slateblue", alpha=0.2) + ylab("average miles per gallon")
+
+```
+
+##### description  
+
+I started by making 2 data sets that include only the years 2008 and 1999  respectively. Then, to simplify and define the "fuel efficiency" of each car, I made an extra column for each set that takes the average of the cars highway miles per gallon and city miles per gallon. Then, by looking at the average of this column for both years, 1999 cars appear to be slightly more efficient.
